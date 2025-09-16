@@ -195,7 +195,7 @@ cls
 Write-Host "localhost:5678 已启动，已通过 Edge 浏览器打开 n8n..."
 $Host.UI.RawUI.WindowTitle = "N8N控制台=使用中勿关闭此窗口!"
 Start-Process -FilePath "msedge" -ArgumentList "http://localhost:5678"
-'@ | sc "$home\desktop\_n8n_.bat" -enc Default
+'@ | sc "$home\desktop\_N8N_.bat" -enc Default
 
 #########################################################################
 where.exe /Q node
