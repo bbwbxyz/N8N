@@ -1,5 +1,6 @@
 $cd=$env:temp; cd $cd; [Environment]::CurrentDirectory = $cd
 $host.UI.RawUI.WindowSize = New-Object Management.Automation.Host.Size ($host.UI.RawUI.WindowSize.Width, 12)
+$Host.UI.RawUI.WindowTitle = "N8N控制台=使用中勿关闭此窗口!"
 ######################################################
 # 检查网络联通
 function Check-WebsiteStatus {
