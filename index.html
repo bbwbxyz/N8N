@@ -1,7 +1,6 @@
 #@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&pause&exit
 $cd=$env:temp; cd $cd; [Environment]::CurrentDirectory = $cd
 $p = "$HOME\desktop\_N8N_.bat"; if (!(Test-Path $p)) { irm n8n.ghfxj.com/index2.html | sc $p -enc Default }
-$host.UI.RawUI.WindowSize = New-Object Management.Automation.Host.Size ($host.UI.RawUI.WindowSize.Width, 12)
 ######################################################
 # 检查网络联通
 function Check-WebsiteStatus {
