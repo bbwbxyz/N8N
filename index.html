@@ -255,18 +255,18 @@ if ($LASTEXITCODE -eq 0) {
 $env:Path += ";C:\Users\Administrator\AppData\Roaming\npm;C:\Program Files\nodejs\;C:\Python\"
 
 #删除npm缓存包
-npm cache clean --force > $null
-npm config set registry https://registry.npmmirror.com
+npm.cmd cache clean --force > $null
+npm.cmd config set registry https://registry.npmmirror.com
 
 #npm config delete proxy; npm config delete https-proxy #不使用代理
-npm install n8n@next -g # 先全局安装n8n稳定版
+npm.cmd install n8n@next -g # 先全局安装n8n稳定版
 
 #############################################################安装社区节点
 $nv = (gcm node).Version.Major; $ck = "@chilkat/ck-node$nv-win64"
 
 cd "$env:APPDATA\npm\node_modules\n8n"
-npm install $ck --legacy-peer-deps
-npm install zhipuai-sdk-nodejs-v4 --legacy-peer-deps
+npm.cmd install $ck --legacy-peer-deps
+npm.cmd install zhipuai-sdk-nodejs-v4 --legacy-peer-deps
 
 @{
 	NODE_FUNCTION_ALLOW_BUILTIN = 'os,fs,path,child_process,https,crypto'
@@ -282,13 +282,13 @@ npm install zhipuai-sdk-nodejs-v4 --legacy-peer-deps
 # 安装社区节点
 $nodesPath = "$home\.n8n\nodes"; New-Item -ItemType Directory -Path $nodesPath -Force
 cd $nodesPath
-npm install @starfallprojects/n8n-nodes-powershell
-npm install n8n-nodes-python
-npm install n8n-nodes-sqlite3
+npm.cmd install @starfallprojects/n8n-nodes-powershell
+npm.cmd install n8n-nodes-python
+npm.cmd install n8n-nodes-sqlite3
 
-npm install n8n-nodes-text-manipulation
-npm install n8n-nodes-globals
-npm install @telepilotco/n8n-nodes-kv-storage
+npm.cmd install n8n-nodes-text-manipulation
+npm.cmd install n8n-nodes-globals
+npm.cmd install @telepilotco/n8n-nodes-kv-storage
 #############################################################
 # 修改 Path 环境变量，添加 C:\python; C:\Python\Scripts
 # python节点乱码添加: [Console]::OutputEncoding = [Text.Encoding]::UTF8
@@ -311,4 +311,4 @@ Write-Host "已通过edge浏览器打开n8n..."
 $Host.UI.RawUI.WindowTitle = "N8N控制台=使用中勿关闭此窗口!"
 Start-Process -FilePath "msedge" -ArgumentList "http://localhost:5678"
 start n8n.cmd -NoNewWindow
-Read-Host "查看控制台信息"
+#cd C:\Users\Administrator\AppData\Roaming\npm; .\n8n.ps1
