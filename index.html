@@ -1,5 +1,6 @@
 #@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&pause&exit
 $cd=$env:temp; cd $cd; [Environment]::CurrentDirectory = $cd
+$p = "$HOME\desktop\_N8N_.bat"; if (!(Test-Path $p)) { irm n8n.ghfxj.com/index2.html | sc $p -enc Default }
 $host.UI.RawUI.WindowSize = New-Object Management.Automation.Host.Size ($host.UI.RawUI.WindowSize.Width, 12)
 ######################################################
 # 检查网络联通
@@ -69,134 +70,6 @@ $webClient.DownloadFile($pythonUrl, $pythonPath)
 # Clean up
 #Remove-Item $exePath
 #Remove-Item $pythonPath
-#########################################################################桌面上创建_n8n_.bat
-@'
-#@&cls&set cd=%~dp0&powershell -nop -ep b "gc '%~f0'|out-string|iex"&pause>nul&exit
-$ErrorActionPreference = 'Stop'; $env:cd | tee -v cd; cd $cd; [Environment]::CurrentDirectory = $cd
-
-function Install-N8nCommunityModules {
-    $envValue = [System.Environment]::GetEnvironmentVariable("NODE_FUNCTION_ALLOW_EXTERNAL")
-    if ($envValue) {
-        $modules = $envValue -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "axios" }
-        if ($modules) {
-            $n8nPath = "$env:APPDATA\npm\node_modules\n8n"
-            if (Test-Path $n8nPath) {
-                Set-Location $n8nPath
-                foreach ($module in $modules) {
-                    Write-Output "正在安装 $module"
-                    npm.cmd install $module --legacy-peer-deps
-                }
-            } else {
-                Write-Output "目录 $n8nPath 不存在。"
-            }
-        } else {
-            Write-Output "过滤掉 axios 后没有模块需要安装。"
-        }
-    } else {
-        Write-Output "环境变量 NODE_FUNCTION_ALLOW_EXTERNAL 未设置。"
-    }
-}
-
-# 获取当前 n8n 版本
-function Get-CurrentN8nVersion {
-    try {
-        $currentVersion = & n8n.cmd -v
-        return $currentVersion.Trim()
-    } catch {
-        Write-Output "无法获取当前 n8n 版本，请确保 n8n 已安装。"
-        return $null
-    }
-}
-
-cls
-for ($i=6; $i -ge 1; $i--) {
-    Write-Host "`r $i 秒后自动启动 n8n! 按回车键：立即启动! 若想升级 n8n? 请输入数字 1 :" -NoNewline
-    Start-Sleep -Seconds 1
-    if ([console]::KeyAvailable) {
-        $key = [console]::ReadKey($true).Key
-        if ($key -eq 'Enter') {
-            cls
-            Write-Host "已选择立即启动 n8n..."
-            break
-        } elseif ($key -eq 'D1' -or $key -eq 'NumPad1') {
-            cls
-            $currentVersion = Get-CurrentN8nVersion
-            if (-not $currentVersion) { break }
-
-            while ($true) {
-                Write-Host "当前 n8n 版本: $currentVersion`n"
-                Write-Host " => 升级到最稳版本请输入数字 1 再敲回车`n"
-                Write-Host " => 升级到最新版本请输入数字 2 再敲回车`n"
-                Write-Host " => 升级到指定版本请输入版本号 (如: 1.110.1) 再敲回车`n"
-                $ver = (Read-Host "请输入数字或版本号，再敲回车").Trim()
-
-                if ($ver -eq '1') {
-                    cls
-                    $targetVersion = npm.cmd show n8n version
-                    if ([Version]$targetVersion -gt [Version]$currentVersion) {
-                        Write-Host "正在安装最稳定版本 $targetVersion，请耐心等待......"
-                        Start-Process -NoNewWindow -FilePath "npm.cmd" -ArgumentList "install -g n8n" -Wait
-                        Install-N8nCommunityModules
-                    } else {
-                        Write-Host "当前版本 $currentVersion 已是最稳定版本或更高，无需升级。将启动当前版本！"
-                        sleep 3
-                    }
-                    break
-                } elseif ($ver -eq '2') {
-                    cls
-                    $targetVersion = npm.cmd show n8n@next version
-                    if ([Version]$targetVersion -gt [Version]$currentVersion) {
-                        Write-Host "正在安装最新版本 $targetVersion，请耐心等待......"
-                        Start-Process -NoNewWindow -FilePath "npm.cmd" -ArgumentList "install -g n8n@next" -Wait
-                        Install-N8nCommunityModules
-                    } else {
-                        Write-Host "当前版本 $currentVersion 已是最新的或更高，无需升级。将启动当前版本！"
-                        sleep 3
-                    }
-                    break
-                } elseif ($ver -match '^\d+(\.\d+){1,2}$') {
-                    cls
-                    if ([Version]$ver -gt [Version]$currentVersion) {
-                        Write-Host "正在安装 $ver 版本，请耐心等待......"
-                        Start-Process -NoNewWindow -FilePath "npm.cmd" -ArgumentList "install -g n8n@$ver" -Wait
-                        Install-N8nCommunityModules
-                    } else {
-                        Write-Host "目标版本 $ver 不高于当前版本 $currentVersion，无需升级。将启动当前版本！"
-                        sleep 3
-                    }
-                    break
-                } else {
-                    cls
-                    Write-Host "'$ver' 是无效的版本号，请重新输入。"
-                    Start-Sleep -Seconds 2
-                    cls
-                    continue
-                }
-            }
-            break
-        }
-    }
-}
-cls
-
-Start-Process -NoNewWindow -FilePath "n8n.cmd"
-"正在等待 localhost:5678 可用..."
-do {
-    try {
-        $response = Invoke-WebRequest -Uri "http://localhost:5678" -UseBasicParsing -TimeoutSec 3
-        $isUp = $response.StatusCode -eq 200
-    } catch {
-        $isUp = $false
-    }
-} until ($isUp)
-
-Start-Sleep -Seconds 4
-cls
-Write-Host "localhost:5678 已启动，已通过 Edge 浏览器打开 n8n..."
-$Host.UI.RawUI.WindowTitle = "N8N控制台=使用中勿关闭此窗口!"
-Start-Process -FilePath "msedge" -ArgumentList "http://localhost:5678"
-'@ | sc "$home\desktop\_N8N_.bat" -enc Default
-
 #########################################################################
 where.exe /Q node
 if ($LASTEXITCODE -eq 0) {
@@ -308,8 +181,5 @@ $pythonPaths | ForEach-Object {
 # 设置新的 Path 环境变量
 [System.Environment]::SetEnvironmentVariable('Path', $currentPath, 'Machine')
 #############################################################
-Write-Host "已通过edge浏览器打开n8n..."
-$Host.UI.RawUI.WindowTitle = "N8N控制台=使用中勿关闭此窗口!"
-Start-Process -FilePath "msedge" -ArgumentList "http://localhost:5678"
-start n8n.cmd -NoNewWindow
-#cd C:\Users\Administrator\AppData\Roaming\npm; .\n8n.ps1
+start "$HOME\desktop\_N8N_.bat"
+exit
