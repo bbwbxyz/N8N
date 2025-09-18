@@ -1,4 +1,4 @@
-#@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&pause&exit
+#@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&exit
 $ErrorActionPreference = 'Stop'; $cd = $env:cd; cd $cd; [Environment]::CurrentDirectory = $cd
 
 if (netstat -ano | Select-String "LISTENING" | Where-Object { $_ -match ":5678" }) { "n8n 运行中.....它在任务栏中!"; Sleep 3; exit }
