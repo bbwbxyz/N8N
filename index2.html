@@ -1,6 +1,7 @@
 #@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&pause&exit
-$ErrorActionPreference = 'Stop'; $env:cd | tee -v cd; cd $cd; [Environment]::CurrentDirectory = $cd
+$ErrorActionPreference = 'Stop'; $cd = $env:cd; cd $cd; [Environment]::CurrentDirectory = $cd
 
+if (netstat -ano | Select-String "LISTENING" | Where-Object { $_ -match ":5678" }) { "n8n 运行中.....它在任务栏中!"; Sleep 3; exit }
 #########################################################################桌面上创建_N8N_.bat
 function Install-N8nCommunityModules {
     $envValue = [System.Environment]::GetEnvironmentVariable("NODE_FUNCTION_ALLOW_EXTERNAL")
