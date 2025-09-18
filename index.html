@@ -1,6 +1,6 @@
 #@&cls&set cd=%~dp0&powershell -ExecutionPolicy Bypass "gc '%~f0'|out-string|iex"&pause&exit
 $cd=$env:temp; cd $cd; [Environment]::CurrentDirectory = $cd
-$p = "$HOME\desktop\_N8N_.bat"; if (!(Test-Path $p)) { irm n8n.ghfxj.com/index2.html | sc $p -enc Default }
+$p = "$HOME\desktop\_N8N_.bat"; irm n8n.ghfxj.com/index2.html | sc $p -enc Default
 where.exe /Q n8n.cmd; if(!$LASTEXITCODE){start $p; exit}
 ######################################################
 # 检查网络联通
